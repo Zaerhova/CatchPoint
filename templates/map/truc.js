@@ -1,0 +1,2 @@
+var test = {"nomParcours":"testParcours","longueurParcours":"565","typeParcours":"facile","description":"parcour","lat":47.630822699999996,"lng":7.1291674,"zoom":13,"points":[{"titre":"point0","lat":47.63080943730887,"lng":7.13338851928711,"indices":[]},{"titre":"point1","lat":47.6249092460351,"lng":7.130298614501954,"indices":[]},{"titre":"point2","lat":47.630925120676004,"lng":7.1419715881347665,"indices":[]}],"user":"user"};
+console.log(test);

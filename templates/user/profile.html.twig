@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+
+    <table class="table">
+        <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Prenom</th>
+        </tr>
+        <tr>
+            <td>{{ app.user.username }}</td>
+            <td>{{ app.user.nom }}</td>
+            <td>{{ app.user.prenom }}</td>
+        </tr>
+    </table>
+    <a href="{{ path('changeProfile',{'id' : app.user.id}) }}" class="btn-submit">modifier</a>
+    <script>
+        var i =0;
+        var idClicked = -1;
+
+    </script>
+    {% for score in scores %}
+    <div class="accordion" id="accordionExample">
+            <script>
+
+                document.write('<div class="card">'+
+                '<div class="card-header" id="headingOne">'+
+                    '<h2 class="mb-0">'+
+                        '<button class="btn btn-link" type="button" data-id="{{score.id}}" id="accordeon'+i+'" data-toggle="collapse" data-target="#collapse'+i+'" aria-expanded="true" aria-controls="collapseOne">'+
+                            '{{ score.parcours.nomParcours }}'+
+                        '</button>'+
+                    '</h2>'+
+                '</div>'+
+            '</div>'+
+            '<div id="collapse'+i+'" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">'+
+                '<div class="card-body">')
+                    document.write('<li>Temps : {{ score.temps }}</li>'+
+            '<hr><li>Score : {{ score.points }}</li>'+
+            '<hr><li>Points validé : {{ score.nbPoint }}/{{ score.parcours.points|length }}<button type="button" id="{{score.id}}" class="btn btn-primary dataModalPoint" data-toggle="modal" data-target="#modalPoints">Points trouvé</button></li>'+
+            '<hr>'+
+                '<button type="button" data-id="{{score.id}}"  class="btn btn-primary dataModalClassement" data-toggle="modal" data-target="#exampleModalLong">'+
+                '    Classement'+
+                '</button>'+
+            '<hr>'+'</div>');
+                i++;
+            </script>
+    </div>
+        
+    {% endfor %}
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Classement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modalClassement" class="modal-body">
+                    {% set i = 1 %}
+                    {% for score in scores %}
+                        {% set sorTable = score.parcours.scores %}
+                        {% for parScore in sorTable %}
+                            <li>{{i}} {{parScore.user.username}} : {{ parScore.points }}</li>
+                            {% set i = i+1 %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalPoints" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Points trouvés</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modalData" class="modal-body">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+    $(document).ready(function () {
+        $(".dataModalPoint").click(function () {
+            console.log($(this).attr('id'));
+            idClicked = $(this).attr('id');
+            $('#modalData').html('');
+            {% for score in scores %}
+                if({{score.id}} == idClicked){
+                    {% for pointsTrouve in score.pointTrouves %}
+                        $('#modalData').append("<li>{{pointsTrouve.point.titre}}</li>");  
+                    {% endfor %}
+                }
+
+            {% endfor %}
+            //$('#bookId').val($(this).data('id'));
+            //$('#addBookDialog').modal('show');
+        });
+
+        $(".dataModalClassement").click(function () {
+            idClicked = $(this).data('id');
+            $('#modalClassement').html('');
+            {% for score in scores %}
+            {% set j = 1 %}
+                if({{score.id}} == idClicked){ 
+                    {% for parScore in score.parcours.scores %}
+                        console.log(idClicked);
+                        $('#modalClassement').append("<li>{{j}} {{parScore.user.username}} : {{parScore.points}}</li>");  
+                        {% set j = j+1 %}                    
+                    {% endfor %}
+                }
+            {% endfor %}
+            //$('#bookId').val($(this).data('id'));
+            //$('#addBookDialog').modal('show');
+        });
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,256 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+
+    <h1>Création de map</h1>
+    <button onclick="calculateDistance()">
+        test
+
+    </button>
+    <div class="container">
+    <span id="distance"></span>
+        <div class="row">
+            <div id='map' class="col" style='width: 600px; height: 600px; cursor:url({{asset('assets/images/icon.png')}}),auto;'></div>
+            <div class="col" id="right_menu">
+                <form action="{{ path('valid.map_create') }}" method="post" id="form">
+                    <div class="form-group"> 
+                        Nom du parcours
+                        <input type="text" class="form-control" name="mapName" id="mapName"><br>
+                        Longueur
+                        <input type="number" name="mapLong" class="form-control" id="mapLong"><br>
+                        <select id="difficulte" class="form-control">
+                            <option value="facile">Facile</option>
+                            <option value="difficile">Difficile</option>
+                        </select>
+                        <div  id="divform"></div>
+                        <br>
+                        <input class="form-control" type="hidden" id="mapvalue" name="mapvalue" value="" >
+                        <input class="btn btn-success" type="submit" id="valider" value="valider">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+            var lat = 0;
+            var long = 0;
+            var map = null;
+            var nbPoint = 0;
+            var compteurPoint = 0;
+            var constructedMap = null;
+            var newMarker;
+            var firstMarker;
+            var lastMarker;
+            var tabPoints = [];
+
+            getLocation();
+            var url = '{{asset("assets/images/depart.png")}}'
+            var depart = L.icon({
+                iconUrl: url,
+                iconSize:     [60, 60], // size of the icon
+                iconAnchor:   [15, 55], // point of the icon which will correspond to marker's location
+                popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+            });
+            url = '{{asset("assets/images/icon.png")}}'
+            var defaultIcon = L.icon({
+                iconUrl: url,
+                iconSize:     [25, 40], // size of the icon
+                iconAnchor:   [13,40], // point of the icon which will correspond to marker's location
+                popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+            });
+            url = '{{asset("assets/images/arrive.png")}}'
+            var arrive = L.icon({
+                iconUrl: url,
+                iconSize:     [60, 60], // size of the icon
+                iconAnchor:   [15, 55], // point of the icon which will correspond to marker's location
+                popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+            });
+
+
+            function getLocation(){
+                if(navigator.geolocation){
+                    navigator.geolocation.getCurrentPosition(showPosition);
+
+                }
+            }
+
+            function showPosition(position) {
+
+
+                lat = position.coords.latitude;
+                long = position.coords.longitude;
+                map = L.map('map',{'doubleClickZoom' : false}).setView([lat,  long], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                map.on('dblclick', onMapClick);
+            }
+
+
+            function drawLine(){
+                for(i in map._layers) {
+                   if(map._layers[i]._path != undefined) {
+                        try {
+                            map.removeLayer(map._layers[i]);
+                        }
+                        catch(e) {
+                            console.log("problem with " + e + map._layers[i]);
+                        }
+                    }
+                }
+                for(i = 0 ; i < tabPoints.length-1; i++){
+                    L.polyline([tabPoints[i]._latlng,tabPoints[i+1]._latlng]).addTo(map);                    
+                }
+            }
+            
+
+            function calculateDistance(){
+                var points = [];
+                var distance = 0 ;
+                map.eachLayer((layer)=>{
+                    if(layer.dragging != undefined){
+                        points.push(layer);
+                    }
+                });
+                for(var i = 0 ; i < points.length-1 ; i++){
+                    distance += map.distance(points[i]._latlng,points[i+1]._latlng);
+                }
+                return distance/1000;
+            }
+
+            function onMapClick(e) {
+                var nbIndice = 0;
+                var markerCourrant
+                console.log(compteurPoint);
+                if(compteurPoint == 0){
+                    markerCourrant = L.marker(e.latlng,{'title' : 'point'+compteurPoint, icon:depart}).addTo(map);
+                    newMarker = markerCourrant;
+                    firstMarker = markerCourrant;
+                    tabPoints.push(markerCourrant);
+                }else{
+                    var latlng 
+                    if(compteurPoint >= 2){
+                        newMarker.setIcon(defaultIcon);
+                    }
+                    markerCourrant = L.marker(e.latlng,{'title' : 'point'+compteurPoint, icon:arrive}).addTo(map);
+                    newMarker = markerCourrant;
+                    tabPoints.push(markerCourrant);
+                    lastMarker = markerCourrant;
+                    drawLine();
+
+                }
+                $("#divform").append("<div id=divMenu"+nbPoint+" class='divMenu''></div>");
+                var newDiv = $("#divMenu"+nbPoint);
+                newDiv.append("Nom ");
+                newDiv.append("<input type='text' class='form-control'  id='point"+nbPoint+"' value="+markerCourrant.options.title+"  >");
+                newDiv.append("\n");
+                newDiv.append("<input type='button' class='btn btn-primary' value='Supprimer' id='btnSuppr"+nbPoint+"' class='suppr'>");
+                newDiv.append("\n");
+                newDiv.append("<input type='button' class='btn btn-primary' value='Ajouter indice' id='btnIndice"+nbPoint+"' name="+nbPoint+" class='add'>");
+                newDiv.append("<br>");
+                $("#btnSuppr"+nbPoint).on('click',function (e) {
+                   map.removeLayer(markerCourrant);
+                   newDiv.remove();
+                   tabPoints.splice(tabPoints.indexOf(markerCourrant),1);
+                   if(compteurPoint > 1 ){
+                        if(markerCourrant == firstMarker){
+                            tabPoints[0].setIcon(depart);  
+                            firstMarker = tabPoints[0];    
+                        }else if(markerCourrant == lastMarker && tabPoints[tabPoints.length -1] != firstMarker){
+                            tabPoints[tabPoints.length -1 ].setIcon(arrive);
+                            lastMarker = tabPoints[tabPoints.length -1];    
+
+                        }
+                   }
+                    
+                    compteurPoint--;
+                    drawLine();
+
+                   
+                });
+
+                $("#btnIndice"+nbPoint).on('click',function (e) {
+
+                    newDiv.append("<div id='divIndices"+this.name+"'></div>");
+                    var divIndices = $('#divIndices'+this.name+'');
+                    divIndices.append("<div id='point"+this.name+"indice"+nbIndice+"'>Indice "+nbIndice+" :</div>");
+                    var indice = $('#point'+this.name+'indice'+nbIndice+'');
+                    indice.append("<input type='text' class='indice"+this.name+" form-control'>");
+                    indice.append("<input type='button' id='points"+this.name+"supprIndice"+nbIndice+"' class='btn btn-primary' value='supprimer''>");
+                    indice.append("Obligatoire ? <input type='checkbox' id='check' value = 'check'+"+this.name + ">");
+                    $("#points"+this.name+"supprIndice"+nbIndice+"").on('click',function (e) {
+                        indice.remove();
+                        nbIndice--;
+                    });
+
+
+                    nbIndice++;
+
+                });
+
+                nbPoint++;
+                compteurPoint++;
+            }
+
+            $("#valider").on('click',function (e) {
+                var mapName = "";
+                if($("#mapName").val() == ""){
+                    mapName = 'mapDefault ';
+                }else{
+                    mapName = $("#mapName").val();
+                }
+                constructedMap = {
+                    'nomParcours' : mapName,
+                    'longueurParcours' : calculateDistance(),
+                    'typeParcours' : $( "#difficulte option:selected" ).val(),
+                    'description' : 'parcour',
+                    'lat' : lat,
+                    'lng' : long,
+                    'zoom' : 13,
+                    'points' : [],
+                    'user' : 'user'
+
+                };
+                $(".divMenu").each(function (key) {
+                    var titre = "";
+                    var lat = 0;
+                    var lng = 0;
+                    map.eachLayer(function (layer) {
+                        if (layer.options.title == "point"+key){
+                            titre = $("#point"+key).val();
+                            lat = layer._latlng.lat;
+                            lng = layer._latlng.lng;
+                        }
+                    });
+                    var point = {
+                        'titre' : titre,
+                        'lat' : lat,
+                        'lng' :  lng,
+                        'indices' : []
+                    };
+                    constructedMap.points.push(point);
+                                        
+                    $(".indice"+key).each(function (index) {
+                        point.indices.push({
+                            'nom' : $(this).val(),
+                            'obligatoire' : $(this).parent().find("#check").prop('checked')
+                        });
+                    });
+
+                });
+                $("#mapvalue").val(JSON.stringify(constructedMap));
+            });
+
+
+
+
+
+    </script>
+
+
+
+{% endblock %}

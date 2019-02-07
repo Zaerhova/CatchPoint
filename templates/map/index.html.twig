@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello {{ controller_name }}!{% endblock %}
+
+{% block body %}
+
+
+    <h1>Liste des parcours</h1>
+
+    <script>
+    
+        var compteurPoint = 0;
+        var tabPoint = [];
+        var i = 0;
+        var maps = [];
+        var url = '{{asset("assets/images/depart.png")}}'
+        var depart = L.icon({
+            iconUrl: url,
+            iconSize:     [60, 60], // size of the icon
+            iconAnchor:   [15, 55], // point of the icon which will correspond to marker's location
+            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+        console.log(depart);
+        url = '{{asset("assets/images/icon.png")}}'
+        var defaultIcon = L.icon({
+            iconUrl: url,
+            iconSize:     [25, 40], // size of the icon
+            iconAnchor:   [13,40], // point of the icon which will correspond to marker's location
+            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+        url = '{{asset("assets/images/arrive.png")}}'
+        var arrive = L.icon({
+            iconUrl: url,
+            iconSize:     [60, 60], // size of the icon
+            iconAnchor:   [15, 55], // point of the icon which will correspond to marker's location
+            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+    
+        function drawMap(map, lat, lng, indices ){
+            console.log(depart);
+            if(compteurPoint == 0){
+                tabPoint.push(L.marker([lat,lng],{'title' : 'point'+compteurPoint, icon:depart}).addTo(map));
+            }else{
+                if(compteurPoint >= 2){
+                    tabPoint[compteurPoint-1].setIcon(defaultIcon);
+                }
+                tabPoint.push(L.marker([lat,lng],{'title' : 'point'+compteurPoint, icon:arrive}).addTo(map));
+
+            }
+            compteurPoint++;
+        }
+
+        function drawLine(map){
+            console.log(tabPoint[0]);
+
+            for(k in map._layers) {
+                if(map._layers[k]._path != undefined) {
+                    try {
+                        map.removeLayer(map._layers[k]);
+                    }
+                    catch(e) {
+                        console.log("problem with " + e + map._layers[k]);
+                    }
+                }
+            }
+            for(j = 0 ; j < tabPoint.length-1 ;j++){
+                L.polyline([tabPoint[j]._latlng,tabPoint[j  +1]._latlng]).addTo(map);                    
+            }
+        }
+
+        function reload(map){
+            L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
+        }
+        {% for parcour in parcours %}
+        {% set isRejoint = false %}
+
+        {% for parcoursRejoint in parcoursRejoints if parcoursRejoints is not empty %}
+        {% if parcoursRejoint.id == parcour.id %}
+        {% set isRejoint = true %}
+        {% endif %}
+        {% endfor %}
+        {% if not isRejoint %}
+        
+        </script>
+        <div class="accordion" id="accordionExample">
+            <script>
+                document.write('<div class="card">'+
+                '<div class="card-header" id="headingOne">'+
+                    '<h2 class="mb-0">'+
+                        '<button class="btn btn-link" type="button" id="accordeon'+i+'" data-toggle="collapse" data-target="#collapse'+i+'" aria-expanded="true" aria-controls="collapseOne">'+
+                            '{{ parcour.nomParcours }}'+
+                        '</button>'+
+                    '</h2>'+
+                '</div>'+
+            '</div>'+
+            '<div id="collapse'+i+'" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">'+
+                '<div class="card-body">')
+                    {% if app.user %}
+
+                    document.write('<form action="{{ path("map_participe") }}" method="post">' +
+                        '<input type="submit" value="participer">' +
+                        '<input type="hidden" name="id" value="{{ parcour.id }}">'+
+                    '</form>')
+                    {% endif %}
+                    document.write('<div id="mapid'+(i)+'" style=\"width: 600px; height: 400px;\"></div>'+
+                '</div>'+
+            '</div>');
+            </script>
+        </div>
+        
+        <script>
+            map = L.map('mapid' + i).setView([ {{ parcour.points[0].lat }}, {{ parcour.points[0].lng }}], 16);
+            maps.push(map);
+            console.log(map);            
+            $('#accordeon'+i).click(i,(e)=>{
+                var mapId = e.currentTarget.id.split('accordeon')[1];
+                L.Util.requestAnimFrame(maps[mapId].invalidateSize,maps[mapId],!1,maps[mapId]._container);
+            });
+            
+            i++;
+
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var nbPoint = 1;
+        {% for point in parcour.points %}
+            var indices = "Point"+ nbPoint;
+            {% for indice in point.indices %}
+            indices += " <br> {{ indice.nom }}" + "<br>";
+
+            {% endfor %}
+                console.log(indices);
+                drawMap(map, {{point.lat}},{{point.lng}}, indices);
+                
+            nbPoint++;
+        {% endfor %}
+            drawLine(map);
+            tabPoint = [];
+            compteurPoint = 0;
+        {% endif %}
+
+        {% endfor %}
+
+
+        
+    </script>
+    
+    
+{% endblock %}
