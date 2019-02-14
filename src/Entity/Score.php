@@ -149,4 +149,27 @@ class Score
         return $this;
     }
 
+    public function addPointTroufe(PointTrouve $pointTroufe): self
+    {
+        if (!$this->pointTrouves->contains($pointTroufe)) {
+            $this->pointTrouves[] = $pointTroufe;
+            $pointTroufe->setScore($this);
+        }
+
+        return $this;
+    }
+
+    public function removePointTroufe(PointTrouve $pointTroufe): self
+    {
+        if ($this->pointTrouves->contains($pointTroufe)) {
+            $this->pointTrouves->removeElement($pointTroufe);
+            // set the owning side to null (unless already changed)
+            if ($pointTroufe->getScore() === $this) {
+                $pointTroufe->setScore(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

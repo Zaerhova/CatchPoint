@@ -68,7 +68,7 @@ class Parcours
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=1000, nullable=true)
+     * @ORM\Column(type="string", length=10000, nullable=true)
      */
     private $json;
 
@@ -193,7 +193,7 @@ class Parcours
         return $this->points;
     }
 
-    public function addPoint(Points $point): self
+    public function addPoint(Points $point)
     {
         if (!$this->points->contains($point)) {
             $this->points[] = $point;

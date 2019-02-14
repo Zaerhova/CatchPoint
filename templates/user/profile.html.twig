@@ -107,7 +107,9 @@
             {% for score in scores %}
                 if({{score.id}} == idClicked){
                     {% for pointsTrouve in score.pointTrouves %}
-                        $('#modalData').append("<li>{{pointsTrouve.point.titre}}</li>");  
+                        {% if pointsTrouve.trouve %}
+                            $('#modalData').append("<li>{{pointsTrouve.point.titre}}</li>");  
+                        {% endif %}
                     {% endfor %}
                 }
 

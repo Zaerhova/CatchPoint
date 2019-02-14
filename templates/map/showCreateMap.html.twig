@@ -4,21 +4,16 @@
 {% block body %}
 
     <h1>Création de map</h1>
-    <button onclick="calculateDistance()">
-        test
-
-    </button>
     <div class="container">
     <span id="distance"></span>
         <div class="row">
             <div id='map' class="col" style='width: 600px; height: 600px; cursor:url({{asset('assets/images/icon.png')}}),auto;'></div>
             <div class="col" id="right_menu">
-                <form action="{{ path('valid.map_create') }}" method="post" id="form">
+                <form action="{{ path('valid.map_create') }}" method="post" id="form" enctype="multipart/form-data">
                     <div class="form-group"> 
                         Nom du parcours
                         <input type="text" class="form-control" name="mapName" id="mapName"><br>
                         Longueur
-                        <input type="number" name="mapLong" class="form-control" id="mapLong"><br>
                         <select id="difficulte" class="form-control">
                             <option value="facile">Facile</option>
                             <option value="difficile">Difficile</option>
@@ -150,7 +145,8 @@
                 newDiv.append("\n");
                 newDiv.append("<input type='button' class='btn btn-primary' value='Supprimer' id='btnSuppr"+nbPoint+"' class='suppr'>");
                 newDiv.append("\n");
-                newDiv.append("<input type='button' class='btn btn-primary' value='Ajouter indice' id='btnIndice"+nbPoint+"' name="+nbPoint+" class='add'>");
+                newDiv.append("<button class='btn btn-primary' type='button' id='textbtnIndice"+nbPoint+"' name="+nbPoint+">Ajouter indice <i class='fas fa-pencil-alt'></i></button>");
+                newDiv.append("<button class='btn btn-primary' type='button' id='imagebtnIndice"+nbPoint+"' name="+nbPoint+">Ajouter indice <i class='fas fa-camera-retro'></i></button>");
                 newDiv.append("<br>");
                 $("#btnSuppr"+nbPoint).on('click',function (e) {
                    map.removeLayer(markerCourrant);
@@ -173,13 +169,32 @@
                    
                 });
 
-                $("#btnIndice"+nbPoint).on('click',function (e) {
+                $("#textbtnIndice"+nbPoint).on('click',function (e) {
 
                     newDiv.append("<div id='divIndices"+this.name+"'></div>");
                     var divIndices = $('#divIndices'+this.name+'');
                     divIndices.append("<div id='point"+this.name+"indice"+nbIndice+"'>Indice "+nbIndice+" :</div>");
                     var indice = $('#point'+this.name+'indice'+nbIndice+'');
                     indice.append("<input type='text' class='indice"+this.name+" form-control'>");
+                    indice.append("<input type='button' id='points"+this.name+"supprIndice"+nbIndice+"' class='btn btn-primary' value='supprimer''>");
+                    indice.append("Obligatoire ? <input type='checkbox' id='check' value = 'check'+"+this.name + ">");
+                    $("#points"+this.name+"supprIndice"+nbIndice+"").on('click',function (e) {
+                        indice.remove();
+                        nbIndice--;
+                    });
+
+
+                    nbIndice++;
+
+                });
+                
+                $("#imagebtnIndice"+nbPoint).on('click',function (e) {
+
+                    newDiv.append("<div id='divIndices"+this.name+"'></div>");
+                    var divIndices = $('#divIndices'+this.name+'');
+                    divIndices.append("<div id='point"+this.name+"indice"+nbIndice+"'>Indice "+nbIndice+" :</div>");
+                    var indice = $('#point'+this.name+'indice'+nbIndice+'');
+                    indice.append("<input type='file' class='indice"+this.name+"' name = 'point"+this.name+"indice"+nbIndice+"' form-control-file' accept='image/png, image/jpeg'>" );
                     indice.append("<input type='button' id='points"+this.name+"supprIndice"+nbIndice+"' class='btn btn-primary' value='supprimer''>");
                     indice.append("Obligatoire ? <input type='checkbox' id='check' value = 'check'+"+this.name + ">");
                     $("#points"+this.name+"supprIndice"+nbIndice+"").on('click',function (e) {
@@ -236,9 +251,10 @@
                                         
                     $(".indice"+key).each(function (index) {
                         point.indices.push({
+                            'type' : $(this).attr('type'),
                             'nom' : $(this).val(),
                             'obligatoire' : $(this).parent().find("#check").prop('checked')
-                        });
+                        });                        
                     });
 
                 });

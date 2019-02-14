@@ -72,6 +72,7 @@
             L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
         }
         {% for parcour in parcours %}
+        {% if parcour.points is defined %}
         {% set isRejoint = false %}
 
         {% for parcoursRejoint in parcoursRejoints if parcoursRejoints is not empty %}
@@ -102,6 +103,8 @@
                         '<input type="hidden" name="id" value="{{ parcour.id }}">'+
                     '</form>')
                     {% endif %}
+                    document.write("Difficulté : {{parcour.typeParcours}}\n");
+                    document.write("Longueur : {{parcour.longueurParcours}}km")
                     document.write('<div id="mapid'+(i)+'" style=\"width: 600px; height: 400px;\"></div>'+
                 '</div>'+
             '</div>');
@@ -109,7 +112,7 @@
         </div>
         
         <script>
-            map = L.map('mapid' + i).setView([ {{ parcour.points[0].lat }}, {{ parcour.points[0].lng }}], 16);
+            map = L.map('mapid' + i).setView([ {{ parcour.points.get(0).lat }}, {{ parcour.points[0].lng }}], 16);
             maps.push(map);
             console.log(map);            
             $('#accordeon'+i).click(i,(e)=>{
@@ -139,6 +142,7 @@
             drawLine(map);
             tabPoint = [];
             compteurPoint = 0;
+        {% endif %}
         {% endif %}
 
         {% endfor %}
