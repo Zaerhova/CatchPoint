@@ -99,10 +99,9 @@ class MapController extends AbstractController
         $parcours->setZoom(intval($mapData["zoom"]));
         $parcours->setDescription($mapData['description']);
         $parcours->addUser($user);
-        $parcours->setJson($_POST['mapvalue']);
         $entityManager->persist($parcours);
         $nbPoint = 0;
-
+        $newData = [];
         foreach ($mapData["points"] as $point) {
             $nbIndice = 0;
             $newpoint = new Points();
@@ -113,6 +112,7 @@ class MapController extends AbstractController
             $newpoint->setParcours($parcours);
             dump($newpoint);
             $entityManager->persist($newpoint);
+            $indices = [];
             foreach ($point['indices'] as $indice) {
                 $newIndice = new Indice();
                 dump($_FILES);
@@ -135,11 +135,13 @@ class MapController extends AbstractController
                             echo __DIR__."../../images";
                         }
                     }
+                    $indice['nom'] = $id;
+                    dump($indice);
+                    array_push($indices,$indice);
                     $newIndice->setImage($id);
                     $newIndice->setPoint($newpoint);
                     $newIndice->setObligatoire($indice['obligatoire']);
-                    $newIndice->setType($indice['type']);
-                    
+                    $newIndice->setType($indice['type']);     
                 }
                 if($indice['obligatoire'] == true){
                     $newIndice->setCout(0);
@@ -149,9 +151,13 @@ class MapController extends AbstractController
                 $entityManager->persist($newIndice);
                 $nbIndice++;
             }
+            array_push($newData,$indices);
             $nbPoint++;
         }
+        $mapData['points'] = $newData;
         dump($parcours);
+        dump($mapData);
+        $parcours->setJson(json_encode($mapData));
         $entityManager->flush();
 
         return $this->render(('map/showCreateMap.html.twig'));
@@ -242,8 +248,14 @@ class MapController extends AbstractController
      */
     public function downloadImage(Request $request){
         $dossier = __DIR__."/../../images/";
-        //$image = $_GET['image'];
-        return $this->file($dossier . 'nomImage');
+        $image = $_GET['image'];
+        return $this->file($dossier . $_GET['image']);
+        // $dossier = __DIR__."/../../images/";
+        // $content = file_get_contents($dossier.'5c65948b021f9');
+        // $response = new Response();
+        // $response->headers->set('Content-Type','mime/type');
+        // $response->headers->set('Content-Disposition', 'attachment;filename="'.'5c65948b021f9');
+        // return $response;
     }
 
 

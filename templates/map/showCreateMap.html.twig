@@ -30,7 +30,6 @@
 
 
     <script>
-
             var lat = 0;
             var long = 0;
             var map = null;
@@ -41,7 +40,6 @@
             var firstMarker;
             var lastMarker;
             var tabPoints = [];
-
             getLocation();
             var url = '{{asset("assets/images/depart.png")}}'
             var depart = L.icon({
@@ -64,18 +62,12 @@
                 iconAnchor:   [15, 55], // point of the icon which will correspond to marker's location
                 popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
             });
-
-
             function getLocation(){
                 if(navigator.geolocation){
                     navigator.geolocation.getCurrentPosition(showPosition);
-
                 }
             }
-
             function showPosition(position) {
-
-
                 lat = position.coords.latitude;
                 long = position.coords.longitude;
                 map = L.map('map',{'doubleClickZoom' : false}).setView([lat,  long], 15);
@@ -84,8 +76,6 @@
                 }).addTo(map);
                 map.on('dblclick', onMapClick);
             }
-
-
             function drawLine(){
                 for(i in map._layers) {
                    if(map._layers[i]._path != undefined) {
@@ -102,7 +92,6 @@
                 }
             }
             
-
             function calculateDistance(){
                 var points = [];
                 var distance = 0 ;
@@ -116,7 +105,6 @@
                 }
                 return distance/1000;
             }
-
             function onMapClick(e) {
                 var nbIndice = 0;
                 var markerCourrant
@@ -136,7 +124,6 @@
                     tabPoints.push(markerCourrant);
                     lastMarker = markerCourrant;
                     drawLine();
-
                 }
                 $("#divform").append("<div id=divMenu"+nbPoint+" class='divMenu''></div>");
                 var newDiv = $("#divMenu"+nbPoint);
@@ -159,18 +146,14 @@
                         }else if(markerCourrant == lastMarker && tabPoints[tabPoints.length -1] != firstMarker){
                             tabPoints[tabPoints.length -1 ].setIcon(arrive);
                             lastMarker = tabPoints[tabPoints.length -1];    
-
                         }
                    }
                     
                     compteurPoint--;
                     drawLine();
-
                    
                 });
-
                 $("#textbtnIndice"+nbPoint).on('click',function (e) {
-
                     newDiv.append("<div id='divIndices"+this.name+"'></div>");
                     var divIndices = $('#divIndices'+this.name+'');
                     divIndices.append("<div id='point"+this.name+"indice"+nbIndice+"'>Indice "+nbIndice+" :</div>");
@@ -182,14 +165,10 @@
                         indice.remove();
                         nbIndice--;
                     });
-
-
                     nbIndice++;
-
                 });
                 
                 $("#imagebtnIndice"+nbPoint).on('click',function (e) {
-
                     newDiv.append("<div id='divIndices"+this.name+"'></div>");
                     var divIndices = $('#divIndices'+this.name+'');
                     divIndices.append("<div id='point"+this.name+"indice"+nbIndice+"'>Indice "+nbIndice+" :</div>");
@@ -201,16 +180,11 @@
                         indice.remove();
                         nbIndice--;
                     });
-
-
                     nbIndice++;
-
                 });
-
                 nbPoint++;
                 compteurPoint++;
             }
-
             $("#valider").on('click',function (e) {
                 var mapName = "";
                 if($("#mapName").val() == ""){
@@ -228,7 +202,6 @@
                     'zoom' : 13,
                     'points' : [],
                     'user' : 'user'
-
                 };
                 $(".divMenu").each(function (key) {
                     var titre = "";
@@ -256,15 +229,9 @@
                             'obligatoire' : $(this).parent().find("#check").prop('checked')
                         });                        
                     });
-
                 });
                 $("#mapvalue").val(JSON.stringify(constructedMap));
             });
-
-
-
-
-
     </script>
 
 
