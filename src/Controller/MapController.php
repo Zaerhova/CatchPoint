@@ -121,15 +121,12 @@ class MapController extends AbstractController
                     $newIndice->setNom($indice['nom']);
                     $newIndice->setPoint($newpoint);
                     $newIndice->setObligatoire($indice['obligatoire']);
-                }else{
+                    $newIndice->setType('text');
 
-                    $newIndice->setImage($indice['nom']);
-                    $newIndice->setPoint($newpoint);
-                    $newIndice->setObligatoire($indice['obligatoire']);
-                    $newIndice->setType($indice['type']);
+                }else{
+                    $id = uniqid();
                     if(isset($_FILES['point'.$nbPoint.'indice'.$nbIndice])){
                         $dossier = __DIR__."/../../images/";
-                        $id = uniqid();
                         $fichier = basename($_FILES['point'.$nbPoint.'indice'.$nbIndice]['name']);
                         if(move_uploaded_file($_FILES['point'.$nbPoint.'indice'.$nbIndice]['tmp_name'],"$dossier$id")){
                             echo 'upload reussi';
@@ -138,6 +135,11 @@ class MapController extends AbstractController
                             echo __DIR__."../../images";
                         }
                     }
+                    $newIndice->setImage($id);
+                    $newIndice->setPoint($newpoint);
+                    $newIndice->setObligatoire($indice['obligatoire']);
+                    $newIndice->setType($indice['type']);
+                    
                 }
                 if($indice['obligatoire'] == true){
                     $newIndice->setCout(0);
@@ -240,7 +242,8 @@ class MapController extends AbstractController
      */
     public function downloadImage(Request $request){
         $dossier = __DIR__."/../../images/";
-        return $this->file($dossier . '5c6562f40506b');
+        $image = $_GET['image'];
+        return $this->file($dossier . $_GET['image']);
     }
 
 
