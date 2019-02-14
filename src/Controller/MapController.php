@@ -242,8 +242,8 @@ class MapController extends AbstractController
      */
     public function downloadImage(Request $request){
         $dossier = __DIR__."/../../images/";
-        $image = $_GET['image'];
-        return $this->file($dossier . $_GET['image']);
+        //$image = $_GET['image'];
+        return $this->file($dossier . 'nomImage');
     }
 
 
