@@ -102,6 +102,8 @@ class MapController extends AbstractController
         $entityManager->persist($parcours);
         $nbPoint = 0;
         $newData = [];
+        dump($mapData["points"]);
+        $mapPoints = [];
         foreach ($mapData["points"] as $point) {
             $nbIndice = 0;
             $newpoint = new Points();
@@ -151,10 +153,15 @@ class MapController extends AbstractController
                 $entityManager->persist($newIndice);
                 $nbIndice++;
             }
-            array_push($newData,$indices);
+            $newData['titre'] = $point['titre'];
+            $newData['lat'] = $point['lat'];
+            $newData['lng'] = $point['lng'];
+            $newData['indices'] = $indices;
+            array_push($mapPoints,$newData);
             $nbPoint++;
+
         }
-        $mapData['points'] = $newData;
+        $mapData['points'] = $mapPoints;
         dump($parcours);
         dump($mapData);
         $parcours->setJson(json_encode($mapData));
