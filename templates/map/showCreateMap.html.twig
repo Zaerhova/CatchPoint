@@ -18,11 +18,11 @@
                             <option value="facile">Facile</option>
                             <option value="difficile">Difficile</option>
                         </select>
-                         <button class="btn btn-primary" id="buttonCollapse" type="button" data-toggle="collapse" data-target="#divForm" aria-expanded="false" aria-controls="divForm">
+                        <button class="btn btn-primary invisible" style='margin-top:5px' id="buttonCollapse" type="button" data-toggle="collapse" data-target="#divForm" aria-expanded="false" aria-controls="divForm">
                             <i class="fas fa-angle-right"></i>
                         </button>
 
-                        <div class="collapse" id="divForm"></div>
+                        <div class="collapse" style="margin-left:30px;"  id="divForm"></div>
                         <br>
                         <input class="form-control" type="hidden" id="mapvalue" name="mapvalue" value="" >
                         <input class="btn btn-success" type="submit" id="valider" value="valider">
@@ -131,6 +131,8 @@
                     newMarker = markerCourrant;
                     firstMarker = markerCourrant;
                     tabPoints.push(markerCourrant);
+                    $('#buttonCollapse').removeClass('invisible');
+                    
                 }else{
                     var latlng 
                     if(compteurPoint >= 2){
@@ -148,14 +150,14 @@
                 var newDiv = $("#divMenu"+nbPoint);
                 newDiv.append("Nom ");
                 newDiv.append("<input type='text' class='form-control'  id='point"+nbPoint+"' value="+markerCourrant.options.title+" >");
-                newDiv.append("<input type='button' class='btn btn-primary' value='Supprimer' id='btnSuppr"+nbPoint+"' class='suppr'>");
+                newDiv.append("<input type='button' class='btn btn-primary' style='margin-top:5px' value='Supprimer' id='btnSuppr"+nbPoint+"' class='suppr'>");
                 newDiv.append("\n");
-                newDiv.append("<button type='button' id='btnCollapse"+nbPoint+"' class='btn btn-primary btnCollapse' data-toggle='collapse' data-target='#collapsPoint"+nbPoint+"' aria-expanded='false' aria-controls='collapsPoint"+nbPoint+"' ><i class='fas fa-angle-right'></i></button> ")
+                newDiv.append("<button type='button' id='btnCollapse"+nbPoint+"' style='margin-top:5px' class='btn btn-primary btnCollapse' data-toggle='collapse' data-target='#collapsPoint"+nbPoint+"' aria-expanded='false' aria-controls='collapsPoint"+nbPoint+"' ><i class='fas fa-angle-right'></i></button> ")
                 newDiv.append("\n");
-                var divCollapse = $("<div class='collapse' id='collapsPoint"+nbPoint+"'></div>");
+                var divCollapse = $("<div class='collapse' style='margin-left:30px' id='collapsPoint"+nbPoint+"'></div>");
                 newDiv.append(divCollapse);
-                divCollapse.append("<button class='btn btn-primary' type='button' id='textbtnIndice"+nbPoint+"' name="+nbPoint+">Ajouter indice <i class='fas fa-pencil-alt'></i></button>");
-                divCollapse.append("<button class='btn btn-primary' type='button' id='imagebtnIndice"+nbPoint+"' name="+nbPoint+">Ajouter indice <i class='fas fa-camera-retro'></i></button>");
+                divCollapse.append("<button class='btn btn-primary' style='margin-top:10px' type='button' id='textbtnIndice"+nbPoint+"' name="+nbPoint+">Ajouter indice <i class='fas fa-pencil-alt'></i></button>");
+                divCollapse.append("<button class='btn btn-primary' style='margin-top:10px; margin-left:5px' type='button' id='imagebtnIndice"+nbPoint+"' name="+nbPoint+">Ajouter indice <i class='fas fa-camera-retro'></i></button>");
                 divCollapse.append("<br>");
                 
                 newDiv.append(divCollapse);
@@ -197,10 +199,10 @@
                     console.log("testbtnindice");
                     divCollapse.append("<div id='divIndices"+this.name+"'></div>");
                     var divIndices = $('#divIndices'+this.name+'');
-                    divIndices.append("<div id='point"+this.name+"indice"+nbIndice+"'>Indice "+nbIndice+" :</div>");
+                    divIndices.append("<div style='margin-bottom:15px' id='point"+this.name+"indice"+nbIndice+"'>Indice "+nbIndice+" :</div>");
                     var indice = $('#point'+this.name+'indice'+nbIndice+'');
                     indice.append("<input type='text' class='indice"+this.name+" form-control'>");
-                    indice.append("<input type='button' id='points"+this.name+"supprIndice"+nbIndice+"' class='btn btn-primary' value='supprimer''>");
+                    indice.append("<input type='button' style='margin-top:5px' id='points"+this.name+"supprIndice"+nbIndice+"' class='btn btn-primary' value='supprimer''>");
                     indice.append("Obligatoire ? <input type='checkbox' id='check' value = 'check'+"+this.name + ">");
                     $("#points"+this.name+"supprIndice"+nbIndice+"").on('click',function (e) {
                         indice.remove();

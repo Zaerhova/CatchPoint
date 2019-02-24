@@ -20,7 +20,7 @@
     </head>
     <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ path('home') }}">Navbar</a>
+        <a class="navbar-brand" href="{{ path('home') }}">CatchPoint</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -33,25 +33,21 @@
                 </li>
 
                 {% if not app.user %}
-                <li class="nav-item">
-                    <a href="{{ path('login') }}" class="nav-link">Connexion</a>
-                </li>
-                    <li class="nav-item">
-                        <a href="{{ path('registration') }}" class="nav-link">S'enregistrer</a>
-                    </li>
+                
                 {% else %}
                 <li class="nav-item">
                     <a href="{{ path('map_create') }}" class="nav-link">Creer Carte</a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ path('logout') }}" class="nav-link">Deconnexion</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ path('profile') }}" class="nav-link">{% if app.user %}{{ app.user.username }}{% endif %}</a>
-                </li>
                 {% endif %}
+                
             </ul>
-
+            {% if not app.user %}
+                <a href="{{ path('login') }}" class="nav-link">Connexion</a>
+                <a href="{{ path('registration') }}" class="nav-link">S'enregistrer</a>
+            {% else %}
+                <a href="{{ path('profile') }}" class="nav-link">{% if app.user %}{{ app.user.username }}{% endif %}</a>
+                <a href="{{ path('logout') }}" class="nav-link">Deconnexion</a>
+            {% endif %}
         </div>
     </nav>
         {% block body %}{% endblock %}
