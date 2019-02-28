@@ -37,7 +37,7 @@
                 '<div class="card-body">')
                     document.write('<li>Temps : {{ score.temps }}</li>'+
             '<hr><li>Score : {{ score.points }}</li>'+
-            '<hr><li>Points validé : {{ score.nbPoint }}/{{ score.parcours.points|length }}<button type="button" id="{{score.id}}" class="btn btn-primary dataModalPoint" data-toggle="modal" data-target="#modalPoints">Points trouvé</button></li>'+
+            '<hr><li>Points validé : {{ score.nbPoint -1  }}/{{ score.parcours.points|length -1 }}<button type="button" id="{{score.id}}" class="btn btn-primary dataModalPoint" data-toggle="modal" data-target="#modalPoints">Points trouvé</button></li>'+
             '<hr>'+
                 '<button type="button" data-id="{{score.id}}"  class="btn btn-primary dataModalClassement" data-toggle="modal" data-target="#exampleModalLong">'+
                 '    Classement'+
@@ -106,10 +106,14 @@
             $('#modalData').html('');
             {% for score in scores %}
                 if({{score.id}} == idClicked){
+                    {% set j = 0 %}
                     {% for pointsTrouve in score.pointTrouves %}
+                        {% if j != 0 %}
                         {% if pointsTrouve.trouve %}
                             $('#modalData').append("<li>{{pointsTrouve.point.titre}}</li>");  
                         {% endif %}
+                        {% endif %}
+                        {% set j = j+1 %}
                     {% endfor %}
                 }
 
